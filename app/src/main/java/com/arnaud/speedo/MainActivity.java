@@ -95,8 +95,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             int currentSpeed = Math.round(location.getSpeed() * 60);
             if(currentSpeed > max_velocity) max_velocity = currentSpeed;
 
-//            avg_speed.setText(String.format("%3d", currentSpeed));
-//            max_speed.setText(String.format("%3d", max_velocity));
             avg_speed.setText(String.format(Locale.getDefault(), "%3d", currentSpeed));
             max_speed.setText(String.format(Locale.getDefault(),"%3d", max_velocity));
 
