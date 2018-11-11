@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 chronometer.setBase(SystemClock.elapsedRealtime();
                 pause_offset = 0;
                 time_running = false;
+                odo = 0;
             }
         });
         */
