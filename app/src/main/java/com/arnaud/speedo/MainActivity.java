@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
@@ -25,7 +26,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private boolean time_running = false;
     private long pause_offset;
 
-    int target_velocity = (int) 30;
+    int target_velocity = (int) 350;
     int low_range_velocity = (int) Math.round(target_velocity * .7);
     int max_range_velocity = (int) Math.round(target_velocity * 1.3);
     int max_velocity = (int) 0;
@@ -46,6 +47,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         this.onLocationChanged(null);
 
         chronometer = findViewById(R.id.time);
+
+        SeekBar speed_cursor = this.findViewById(R.id.speedBar);
+        speed_cursor.setEnabled(false);
 
         Button buttonStart = findViewById(R.id.start_button);
         buttonStart.setOnClickListener(new View.OnClickListener() {
@@ -94,7 +98,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     }
 
-    //@SuppressLint("DefaultLocale")
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+
     @Override
     public void onLocationChanged(Location location) {
         TextView avg_speed = this.findViewById(R.id.avg_speed);
@@ -148,4 +159,3 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     }
 
 }
-

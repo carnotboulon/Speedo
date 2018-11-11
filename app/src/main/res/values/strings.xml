@@ -17,5 +17,6 @@
     <string name="label_start">START</string>
     <string name="label_stop">STOP</string>
     <string name="label_reset">RESET</string>
+    <string name="label_settings">Settings</string>
 
 </resources>
