@@ -10,6 +10,7 @@ import android.location.LocationManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     int max_cursor_speed = (int) Math.round(target_velocity * 1.5);
 
     float odo = 0;
+    Location last_location;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +51,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         buttonStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.d("YOYO", "Start Pushed.");
+                Log.d("YOYO", String.format(Locale.getDefault(), "%.3f", odo));
                 if(!time_running){
                     chronometer.setBase(SystemClock.elapsedRealtime() - pause_offset);
                     chronometer.start();
@@ -66,22 +70,28 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                     pause_offset = SystemClock.elapsedRealtime() - chronometer.getBase();
                     time_running = false;
                 }
+                Log.d("YOYO", "Stop Pushed.");
+                Log.d("YOYO", String.format(Locale.getDefault(), "%.3f", odo));
             }
         });
 
-        /*
+        final TextView odo_view = this.findViewById(R.id.odo);
+        final TextView max_speed = this.findViewById(R.id.max_speed);
         Button buttonReset = findViewById(R.id.reset_button);
-        buttonStop.setOnClickListener(new View.OnClickListener() {
+        buttonReset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 chronometer.stop();
-                chronometer.setBase(SystemClock.elapsedRealtime();
                 pause_offset = 0;
                 time_running = false;
                 odo = 0;
+                last_location = null;
+                max_speed.setText(String.format(Locale.getDefault(), "%03d", 0));
+                odo_view.setText(String.format(Locale.getDefault(), "%.3f", 0.));
+                chronometer.setBase(SystemClock.elapsedRealtime() - pause_offset);
             }
         });
-        */
+
     }
 
     //@SuppressLint("DefaultLocale")
@@ -89,27 +99,35 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public void onLocationChanged(Location location) {
         TextView avg_speed = this.findViewById(R.id.avg_speed);
         TextView max_speed = this.findViewById(R.id.max_speed);
+        TextView odo_view = this.findViewById(R.id.odo);
 
         if(location == null){
             avg_speed.setText("---");
         }else{
+
+            //Get speed
             int currentSpeed = Math.round(location.getSpeed() * 60);
             if(currentSpeed > max_velocity) max_velocity = currentSpeed;
-
-            avg_speed.setText(String.format(Locale.getDefault(), "%3d", currentSpeed));
-            max_speed.setText(String.format(Locale.getDefault(),"%3d", max_velocity));
-
-
+            //Update Speed fields
+            avg_speed.setText(String.format(Locale.getDefault(), "%03d", currentSpeed));
+            max_speed.setText(String.format(Locale.getDefault(),"%03d", max_velocity));
+            //Update style based on new speeds
             if(currentSpeed > max_range_velocity || currentSpeed < low_range_velocity) {
-                avg_speed.setTextColor(Color.RED);
+                avg_speed.setTextColor(Color.rgb(216,27,96));
             }else{
-                avg_speed.setTextColor(Color.GREEN);
+                avg_speed.setTextColor(Color.rgb(0,133,119));
             }
             //update progress
             int speed_percentage = (int) Math.round(100.*(currentSpeed - min_cursor_speed)/(max_cursor_speed - min_cursor_speed));
             SeekBar speed_cursor = this.findViewById(R.id.speedBar);
             speed_cursor.setProgress(speed_percentage, true);
+            speed_cursor.setEnabled(false);
 
+            //Get location
+            if (last_location != null && time_running) odo += location.distanceTo(last_location)/1000.;
+            odo_view.setText(String.format(Locale.getDefault(), "%.3f", odo));
+            last_location = location;
+            Log.d("YOYO", String.format(Locale.getDefault(), "%.3f", odo));
         }
 
     }

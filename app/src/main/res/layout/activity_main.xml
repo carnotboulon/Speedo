@@ -54,10 +54,11 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
+                android:includeFontPadding="false"
                 android:text="@string/initial_velocity"
                 android:textAlignment="center"
                 android:textColor="@android:color/black"
-                android:textSize="80sp" />
+                android:textSize="100sp" />
 
             <TextView
                 android:id="@+id/textView9"
@@ -91,10 +92,11 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
+                android:gravity="center_vertical"
                 android:text="@string/initial_velocity"
                 android:textAlignment="center"
                 android:textColor="@android:color/black"
-                android:textSize="30sp" />
+                android:textSize="50sp" />
 
             <TextView
                 android:id="@+id/textView13"
@@ -131,7 +133,7 @@
                 android:text="@string/initial_distance"
                 android:textAlignment="center"
                 android:textColor="@android:color/black"
-                android:textSize="30sp" />
+                android:textSize="50sp" />
 
             <TextView
                 android:id="@+id/textView18"
@@ -169,7 +171,7 @@
                 android:text="@string/initial_time"
                 android:textAlignment="center"
                 android:textColor="@android:color/black"
-                android:textSize="30sp" />
+                android:textSize="50sp" />
 
             <TextView
                 android:id="@+id/textView24"
@@ -189,7 +191,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="5dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -197,22 +199,38 @@
 
         <Button
             android:id="@+id/stop_button"
+            style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
             android:layout_weight="1"
+            android:background="@color/colorAccent"
             android:text="@string/label_stop"
             android:textSize="18sp" />
 
-        <Space
+        <Button
+            android:id="@+id/reset_button"
+            style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:background="?android:attr/colorButtonNormal"
+            android:text="@string/label_reset"
+            android:textSize="18sp" />
 
         <Button
             android:id="@+id/start_button"
+            style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
             android:layout_weight="1"
+            android:background="@color/colorPrimary"
             android:text="@string/label_start"
             android:textSize="18sp" />
     </LinearLayout>
