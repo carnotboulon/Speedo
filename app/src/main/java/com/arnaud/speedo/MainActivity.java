@@ -29,7 +29,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private boolean time_running = false;
     private long pause_offset;
 
-    int target_velocity = (int) 350;
+    int target_velocity = (int) 350;    //[m/min]
+    int gps_min_time = (int) 3;         //[s]
+    int gps_min_dist = (int) 5;         //[m]
+
     int low_range_velocity = (int) Math.round(target_velocity * .7);
     int max_range_velocity = (int) Math.round(target_velocity * 1.3);
     int max_velocity = (int) 0;
@@ -46,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         setContentView(R.layout.activity_main);
 
         LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 5, this);
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, gps_min_time*1000, gps_min_dist, this);
         this.onLocationChanged(null);
 
         chronometer = findViewById(R.id.time);
@@ -117,9 +120,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 String gps_update_time = data.getStringExtra("gps_update_time");
                 String gps_update_dist = data.getStringExtra("gps_update_dist");
 
-                Log.d("YOYO", "User Target Speed : %s" + target_speed);
-                Log.d("YOYO", "GPS Update time : %s" + gps_update_time);
-                Log.d("YOYO", "GPS Update Distance : %s" + gps_update_dist);
+                Log.d("YOYO", "User Target Speed : " + target_speed);
+                Log.d("YOYO", "GPS Update time : " + gps_update_time);
+                Log.d("YOYO", "GPS Update Distance : " + gps_update_dist);
             }
         }
     }
@@ -149,6 +152,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     @Override
     public void onLocationChanged(Location location) {
+        Log.d("YOYO", "Running Target Velocity : " + target_velocity);
+        Log.d("YOYO", "Running GPS Update Time : " + gps_min_time);
+        Log.d("YOYO", "Running GPS Update Distance : " + gps_min_dist);
+
+
         TextView avg_speed = this.findViewById(R.id.avg_speed);
         TextView max_speed = this.findViewById(R.id.max_speed);
         TextView odo_view = this.findViewById(R.id.odo);
