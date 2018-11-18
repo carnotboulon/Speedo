@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -18,9 +19,20 @@ public class SettingsActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    public void onBackPressed() {
-        Log.d("YOYO", "Go back to parent activity.");
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Log.d("YOYO", "Menu button has been pressed.");
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                Log.d("YOYO", "Up button has been pressed.");
+                sendResultsUp();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    //@Override
+    public void sendResultsUp() {
+        Log.d("YOYO", "Sending results back to parent activity.");
         Toast.makeText(this,"onBackPressed",Toast.LENGTH_SHORT).show();
         Intent intent = new Intent();
 
