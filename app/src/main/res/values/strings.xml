@@ -19,4 +19,9 @@
     <string name="label_reset">RESET</string>
     <string name="label_settings">Settings</string>
 
+    <string name="settings_title">Set your parameters:</string>
+    <string name="targetSpeed_text">Target Speed [m/min]</string>
+    <string name="gps_update_time">GPS Update Rate [s]</string>
+    <string name="gps_update_dist">GPS Update Rate [m]</string>
+
 </resources>
