@@ -4,10 +4,13 @@ package com.arnaud.speedo;
 //import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -17,7 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
-import android.widget.EditText;
+//import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.os.SystemClock;
@@ -25,32 +28,51 @@ import android.os.SystemClock;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
-    private Chronometer chronometer;
-    private boolean time_running = false;
-    private long pause_offset;
-
-    int target_velocity = (int) 350;    //[m/min]
-    int gps_min_time = (int) 3;         //[s]
-    int gps_min_dist = (int) 5;         //[m]
-
-    int low_range_velocity = (int) Math.round(target_velocity * .7);
-    int max_range_velocity = (int) Math.round(target_velocity * 1.3);
-    int max_velocity = (int) 0;
-
-    int min_cursor_speed = (int) Math.round(target_velocity * .5);
-    int max_cursor_speed = (int) Math.round(target_velocity * 1.5);
-
+    private static final int MY_PERMISSION_ACCESS_FINE_LOCATION = 12;
+    int initial_target_velocity = 350;          //[m/min]
+    int initial_gps_min_time = 3;               //[s]
+    int initial_gps_min_dist = 5;               //[m]
     float odo = 0;
+    int max_velocity = 0;
+    private boolean time_running = false;
+
+    private Chronometer chronometer;
+    private long pause_offset;
+    int target_velocity;
+    int low_range_velocity, max_range_velocity;
+    int min_cursor_speed, max_cursor_speed;
     Location last_location;
+    LocationManager lm;
+
+    public void setVelocities(int targetVel){
+        target_velocity = targetVel;
+        low_range_velocity = (int) Math.round(target_velocity * .7);        //text color
+        max_range_velocity = (int) Math.round(target_velocity * 1.3);       //text color
+
+        min_cursor_speed = (int) Math.round(target_velocity * .5);          //cursor min value
+        max_cursor_speed = (int) Math.round(target_velocity * 1.5);         //cursor max value
+
+        Log.d("YOYO", "Setting velocities. New Target Speed = " + target_velocity);
+    }
+
+    public void updateLocationRequestParameters(int min_time, int min_dist){
+        if(lm != null) lm.removeUpdates(this);
+        lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSION_ACCESS_FINE_LOCATION);
+        }
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, min_time*1000, min_dist, this);
+        this.onLocationChanged(null);
+        Log.d("YOYO", "Updating GPS updates parameters. New min time = " + min_time +"[s] + min dist = " + min_dist + "[m].");
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, gps_min_time*1000, gps_min_dist, this);
-        this.onLocationChanged(null);
+        setVelocities(initial_target_velocity);
+        updateLocationRequestParameters(initial_gps_min_time, initial_gps_min_dist);
 
         chronometer = findViewById(R.id.time);
 
@@ -61,13 +83,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         buttonStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("YOYO", "Start Pushed.");
-                Log.d("YOYO", String.format(Locale.getDefault(), "%.3f", odo));
                 if(!time_running){
                     chronometer.setBase(SystemClock.elapsedRealtime() - pause_offset);
                     chronometer.start();
                     time_running = true;
                 }
+                Log.d("YOYO", "Start Pushed.");
             }
         });
 
@@ -81,7 +102,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                     time_running = false;
                 }
                 Log.d("YOYO", "Stop Pushed.");
-                Log.d("YOYO", String.format(Locale.getDefault(), "%.3f", odo));
             }
         });
 
@@ -99,6 +119,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 max_speed.setText(String.format(Locale.getDefault(), "%03d", 0));
                 odo_view.setText(String.format(Locale.getDefault(), "%.3f", 0.));
                 chronometer.setBase(SystemClock.elapsedRealtime() - pause_offset);
+                Log.d("YOYO", "Reset Pushed.");
             }
         });
 
@@ -106,23 +127,23 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     //Open the settings page
     public void edit_settings() {
-        Log.d("YOYO", "Opening Settings");
+        //Log.d("YOYO", "Opening Settings");
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivityForResult(intent,1);
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d("YOYO", "On activity result");
+        //Log.d("YOYO", "On activity result");
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1) {
             if(resultCode == RESULT_OK) {
-                String target_speed = data.getStringExtra("target_speed");
-                String gps_update_time = data.getStringExtra("gps_update_time");
-                String gps_update_dist = data.getStringExtra("gps_update_dist");
 
-                Log.d("YOYO", "User Target Speed : " + target_speed);
-                Log.d("YOYO", "GPS Update time : " + gps_update_time);
-                Log.d("YOYO", "GPS Update Distance : " + gps_update_dist);
+                int target_speed = Integer.parseInt(data.getStringExtra("target_speed"));
+                int gps_update_time = Integer.parseInt(data.getStringExtra("gps_update_time"));
+                int gps_update_dist = Integer.parseInt(data.getStringExtra("gps_update_dist"));
+
+                setVelocities(target_speed);
+                updateLocationRequestParameters(gps_update_time,gps_update_dist);
             }
         }
     }
@@ -138,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
-                Log.d("YOYO","Settings button clicked!");
+                //Log.d("YOYO","Settings button clicked!");
                 edit_settings();
                 return true;
 
@@ -152,10 +173,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.d("YOYO", "Running Target Velocity : " + target_velocity);
-        Log.d("YOYO", "Running GPS Update Time : " + gps_min_time);
-        Log.d("YOYO", "Running GPS Update Distance : " + gps_min_dist);
-
 
         TextView avg_speed = this.findViewById(R.id.avg_speed);
         TextView max_speed = this.findViewById(R.id.max_speed);
