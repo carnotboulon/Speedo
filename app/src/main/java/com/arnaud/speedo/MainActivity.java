@@ -1,7 +1,5 @@
 package com.arnaud.speedo;
 
-
-//import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -20,7 +18,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
-//import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.os.SystemClock;
