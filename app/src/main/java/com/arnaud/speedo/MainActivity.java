@@ -24,14 +24,15 @@ import android.widget.Chronometer;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.os.SystemClock;
+import android.widget.Toast;
 
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
     private static final int MY_PERMISSION_ACCESS_FINE_LOCATION = 12;
     int initial_target_velocity = 350;          //[m/min]
-    int initial_gps_min_time = 3;               //[s]
-    int initial_gps_min_dist = 5;               //[m]
+    int gps_min_time = 3;               //[s]
+    int gps_min_dist = 5;               //[m]
     float odo = 0;
     int max_velocity = 0;
     private boolean time_running = false;
@@ -72,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         setContentView(R.layout.activity_main);
 
         setVelocities(initial_target_velocity);
-        updateLocationRequestParameters(initial_gps_min_time, initial_gps_min_dist);
+        updateLocationRequestParameters(gps_min_time, gps_min_dist);
 
         chronometer = findViewById(R.id.time);
 
@@ -129,6 +130,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public void edit_settings() {
         //Log.d("YOYO", "Opening Settings");
         Intent intent = new Intent(this, SettingsActivity.class);
+        intent.putExtra("target_velocity", target_velocity);
+        intent.putExtra("gps_min_time", gps_min_time);
+        intent.putExtra("gps_min_dist", gps_min_dist);
         startActivityForResult(intent,1);
     }
 
@@ -138,12 +142,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         if (requestCode == 1) {
             if(resultCode == RESULT_OK) {
 
-                int target_speed = Integer.parseInt(data.getStringExtra("target_speed"));
-                int gps_update_time = Integer.parseInt(data.getStringExtra("gps_update_time"));
-                int gps_update_dist = Integer.parseInt(data.getStringExtra("gps_update_dist"));
-
-                setVelocities(target_speed);
-                updateLocationRequestParameters(gps_update_time,gps_update_dist);
+                try{
+                    int target_speed = Integer.parseInt(data.getStringExtra("target_speed"));
+                    gps_min_time = Integer.parseInt(data.getStringExtra("gps_update_time"));
+                    gps_min_dist = Integer.parseInt(data.getStringExtra("gps_update_dist"));
+                    setVelocities(target_speed);
+                    updateLocationRequestParameters(gps_min_time,gps_min_dist);
+                }catch(NumberFormatException e){
+                    Log.d("YOYO", "Couldn't parse user inputs.");
+                    Toast.makeText(getApplicationContext(), "Couldn't parse your inputs.", Toast.LENGTH_LONG).show();
+                }
             }
         }
     }

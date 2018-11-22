@@ -3,10 +3,10 @@ package com.arnaud.speedo;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-//import android.util.Log;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.EditText;
-//import android.widget.Toast;
+import android.widget.TextView;
 
 
 public class SettingsActivity extends AppCompatActivity {
@@ -15,8 +15,22 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        //Log.d("YOYO", "In settings activity");
+        Log.d("YOYO", "In settings activity");
+        Intent intent = getIntent();
+        int target_speed = intent.getIntExtra("target_velocity",0);
+        int gps_min_time = intent.getIntExtra("gps_min_time", 0);
+        int gps_min_dist = intent.getIntExtra("gps_min_dist", 0);
 
+        EditText target_speed_ET = findViewById(R.id.user_target_speed);
+        target_speed_ET.setText(String.valueOf(target_speed), TextView.BufferType.EDITABLE);
+        EditText gps_min_time_ET = findViewById(R.id.user_gps_update_time);
+        gps_min_time_ET.setText(String.valueOf(gps_min_time), TextView.BufferType.EDITABLE);
+        EditText gps_min_dist_ET = findViewById(R.id.user_gps_update_dist);
+        gps_min_dist_ET.setText(String.valueOf(gps_min_dist), TextView.BufferType.EDITABLE);
+
+        Log.d("YOYO", "target_speed = " + target_speed);
+        Log.d("YOYO", "gps_min_time = " + gps_min_time);
+        Log.d("YOYO", "gps_min_dist = " + gps_min_dist);
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
