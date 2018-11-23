@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.SeekBar;
@@ -28,8 +29,8 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity implements LocationListener {
     private static final int MY_PERMISSION_ACCESS_FINE_LOCATION = 12;
     int initial_target_velocity = 350;          //[m/min]
-    int gps_min_time = 3;               //[s]
-    int gps_min_dist = 5;               //[m]
+    int gps_min_time = 1;               //[s]
+    int gps_min_dist = 1;               //[m]
     float odo = 0;
     int max_velocity = 0;
     private boolean time_running = false;
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         setVelocities(initial_target_velocity);
         updateLocationRequestParameters(gps_min_time, gps_min_dist);
@@ -113,6 +115,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 pause_offset = 0;
                 time_running = false;
                 odo = 0;
+                max_velocity = 0;
                 last_location = null;
                 max_speed.setText(String.format(Locale.getDefault(), "%03d", 0));
                 odo_view.setText(String.format(Locale.getDefault(), "%.3f", 0.));
